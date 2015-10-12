@@ -1,0 +1,399 @@
+Notes for mages guild
+
+2015/07/22	Met with graeme, hashed out some initial ideas.  Want a game similar to 
+			God save the queen, but with more freedom of things to do.  Each month
+			you'll need to set how you're dividing your time between various tasks, 
+			but rather than picking two from a list of many, you'll set values on
+			a few sliders (eg, study, socialize, relax, spy, etc.), which will 
+			impact your stats.  After each slider-setting, there will be an event, 
+			which will give some text describing the event, then a list of options
+			to select from.  The event itself, and the options within it will depend
+			on the game state (stats and flags that can be set in other events), and
+			will impact the game state.  
+			
+			My initial task is to get a prototype of that loop up and running, so that
+			we can tweak it from there.  Graeme will do some writing of the first year
+			or so of game time so we can see how the two match up.  given ourselves 
+			two weeks to complete these initial tasks.  
+			
+			Objects needed: 
+				mages (both the player, and the class mates), which will have stats
+						and flags.  NPCs will have personality traits as well, but
+						which will basically just be NPC-only flags.  
+				Events, which will have text, options, and consequences.  Will probably
+						also have to have pre-reqs for occuring too.
+				Display object, which will show the two screen types (sliders and 
+						events)
+				Main function, which will keep track of time steps, game state, and
+						repeatedly call the display object's functions, and alternate
+						between the two screens.  ie, it'll do all the work.  it is 
+						the model part of the model-control-display triad. 
+				stats, which are just associative arrays, but making them objects
+						will make it easier to change what stats mages can have.
+				flags, just a plain old list of strings probably, with a function to
+						check if it contains a value.  Again may be too simple to 
+						justify its own class, but probably will be useful to make
+						it one, as it'll be easier to expand than if we hard code it
+						as an array.  
+				Calendar?	not sure if this is necessary.  Could just do "month 43" 
+						or whatever, but probably nicer to have an IC calendar instead.
+				Guild	is a list of mages, and possibly their views of one another?  
+						May also include norms/rules that the guild enforces, and the
+						consequences of violating them.  
+				Rules	a list of things you can't do, and the consequences for violating
+						them.  Will be part of the guild object, and will need to be checked
+						after/during each event.  
+				
+			Also need to figure out something that will let Graeme enter events into the game
+			without me having to cut-and-paste his stuff into the code.  So may need to write
+			a little engine that lets him do that.  Need to think a bit more about how to
+			handle that best (since we'll be working on different computers).  
+			
+			Also need to think about the guts of the engine.  How will events be selected
+			each month?  Will be list of all events, which will need to get filtered down
+			to only those that are possible given the state, and then one of them selected.
+			Will each possible event be equally likely, or will some be more likely than
+			others?  Also, how do NPCs advance each month?  They'll presumably select their
+			actions each month as well based on some formula (with random component?) that
+			will update their stats.  Will they have events too?  Or will the PC's events 
+			cover what, if anything, the NPCs do beyond their slider selection?  
+
+2015/07/28	started coding things up, using G's first-6-turns right up as a guide.  Reached
+			a question point about flags, and what should be included with what objects.  
+			Does "A likes B" go with A, B, both, or some container object that holds them both?
+			Do stat-altering objects just up the stat directly, or only apply when "used"? (and
+			if the latter, when/how are they used?)  How best to keep effects of flags defined
+			on themselves, but applied at the right phase of the game?  Going to move onto the
+			gui part and let those questions percolate a bit...
+			
+			need one object(so a class) for the game state, and another for the gui.  The
+			gui part will contain sub-windows, so probably want a class for each of those
+			as well, with methods in the gui object for displaying each when called.  the 
+			main function will interact with both the gui and the game state, updating
+			each by sending message when appropriate.  
+			
+			right now the gui has hard-coded width/height, and behaves oddly when resized.
+			when we get further, i need to make it be able to handle things better.
+			
+			Note: remembered that I can make the main code hold game logic by putting 
+			methods in there that can be called without an instance of the class (static?),
+			so can hold the game state there, and talk to the gui and game state using 
+			methods in the class that holds the main function.
+			
+			TODO wednesday:  create a dummy character with some stats, and make them display
+			in the character window.  fill in the gameState class with attributes so that
+			I can get the main window of the gui looping through stages (don't worry about
+			doing stuff in each stage just yet; fine to just show a place-holder message
+			for now).  create a class for events. 
+			
+2015/07/29	Starting up today working on the TODO list from yesterday...
+			-added temp image of wizard to player info section of screen
+			-added some dummy stats and looped over them to display in the character half of screen
+			-created functionality to redraw the main gui frame for each phase of the game.
+				currently just has a message saying what the phase will do, and has a done button
+				to move to the next phase.  next step is to start populating these phases.  the first
+				one is the "slider" screen.  ideally want to write a function that creates this given
+				a list of options, rather than hard-coding it in.  the last two screens will be for
+				events, and I'll need to make a new class for those next week.
+				
+2015/08/03	back at it again.  will meet up with G tomorrow pm, so ideally will get the slider screen
+			done today.  can use a private class for the sub-sections of the slider page, since they're
+			not going to be re-usable elsewhere.  will have an int and a text box within the main
+			class for showing the remaining ("relax") time left to be distributed.  The subsections
+			will extend jpanel, and have an int value, two buttons (+ and -), and a textbox/label which
+			displays the value.  When the buttons are pushed, it will increase the local value, and 
+			decrease the parent's relax value.  buttons should become non-functional when at max/min
+			possible.  finally, their will be a done button in the corner which should submit the 
+			values to the gamestate for updating.  
+				-have created the private class for the mini guis, and all seems to be working as desired
+					(except buttons don't /appear/ disabled when at max/min values; they don't do anything
+					but you can still click on them.  may want to change this)
+			TODO:  Tomorrow I need to get the event class written and implemented, to be able to show
+			how the last two phases will look/work.  doesn't need to do much for now, but needs to work
+			as a demonstration of the concept.  
+			
+2015/08/04	just the morning to work on things today, as meeting graeme at 1pm to discuss progress.  need
+			to get an event class up and running to demonstrate how things will work.  Should be okay to
+			use same class for both special events and the normal, random ones, and just have them selected
+			in different manners.  
+			-ran into trouble early, because would like to use methods as parameters for constructor of
+				event objects, but not possible in java.  one option is to upgrade to java 8, which has
+				lambda objects, but not sure that will actually fix what i'm trying to do, also would
+				be a bit of a hassle.  another option is to do similar to what i did in chieftain, and
+				create a code system for conditions and consequences.  this will be fairly messy and 
+				error prone.  Another possible option is to use the work-around of action listeners
+				as methods?  will need to look into if this is possible...wouldn't necessarily solve the
+				issue, because wouldn't handle the conditional part (ie, would wait for some event to
+				occur before running the code to check them).  So seems like internal coding/decoding
+				system it will have to be...No!  looked at lambda's more, and that's really what I should
+				be using here, and will be good for me to learn.  won't be able to get them up and running
+				by this afternoon, though (will need to upgrade to java 8, get eclipse on board, and may
+				have to copy the files over to a new project once i do...lots of possible snags in there),
+				so for this afternoon get a dummy run going without conditionals and consequences, just
+				to get a demo.  then next week get java 8 installed, and redo with lambdas
+				
+2015/08/10	Back at it for another (two day) week!  installed java 8 last night, and tried setting eclipse
+			up to use it this morning.  not sure yet if it worked...so need to write my first lambda and 
+			see what happens!
+				-first attempt (using a lambda with an actionlistoner, doesn't seem to have worked...
+					-changed from 7 to 8 in a few sections, but still looks like it only sees at 7 
+						compiler (looking at project->properties->java compiler) 				
+					-downloaded the newest version of eclipse, seems to have worked so far, but
+						still have errors in my lambda...(reverted to old version of file, and it
+						seemed to have worked fine, so at least haven't lost any ground yet...)
+				-tried a simple 'helloworld' example of a lambda from online, and it worked, so java
+					and eclipse are working fine.  still haven't got it handling my actionListener
+					as I want it to, but the fiddly bit should be over now!
+				-fixed it!  so all is working as expected/desired now!  Huzzah!
+				-coded up Event class using lambdas.
+			todo tomorrow:  get the rules class up and running, and create some sample mages, events
+				within it to test out the functionality, and that all running.  then work on getting
+				the gui looking nicer (perhaps with that MIGlayout thing).  check notes in my kindle
+				to make sure i didn't forget anything.  also put character traits/properties for
+				mages into the rules class.  
+
+2015/08/11	Going to start the day creating the rules class to hold game-specific stuff, and put 
+			in it a few examples of the classes (mage, event for now) to play around with and
+			test functionality.  
+			--removed the Mage class and replaced it with Character class, which seems a bit more
+				general (especially if the idea is to make all the setting-specific stuff be held
+				in the rulesSet).  
+			--add a gender pronoun enum thing to the character class, so when writing events it will
+				be easy to get the character's gender without having to know the character beforehand.
+			--changed all the stuff in the existing gui code to use characters instead of mages
+			--created a rulesset class, with a sample character and event
+			--had to make some changes to the gui logic to make the character info page update when
+				the other panel had done something to change it.  now repaints the character info
+				panel each time it repaints the main panel.  looks a bit wonky now (size issues)
+				but can deal with that next week.  but it now updates the character info based on
+				the lambda in the sample event	
+			
+2015/08/17	
+			--added a back button to phase 2
+			--looked into miglayout
+			
+2015/08/18	today need to get miglayout working.  if that goes smoothly, put a menubar in as well
+			--downloaded the jar, put it in the eclipse all folder, and added it to the build path
+			--used ctrl-shift-o to find the proper include, and all seems to be working fine now.
+				have replaced all the references to gbc in the main gui panel, but will need to
+				do the actual formatting now and get it to look nice(ish).  will probably take some
+				degree of fiddling...
+			--making decent progress with the layout.  is pretty intuitive.  need to figure out 
+				how to send it multiple commands at same time (eg, span 2 and wrap), but otherwise
+				is working nicely. 
+				--to supply multiple commands, just separate them with commas.  nice and easy!
+			--gui is more or less updated for MigLayout.  still have the issue of setting the 
+				preferred sizes of things, and how I want to handle that, but am leaving as is for 
+				now, so can work on putting in a menu bar.
+			--menu bar added, but only with "test" menu items and currently no functionality.  will
+				need to ask Graeme what values he wants all of these to take.  
+				
+			for next week:  need to put more into the rule set (player info etc) from Graeme's notes,
+				and get the 2nd random event page working like the first.  try implementing some of
+				graeme's example events using my classes, and make sure it's doable.  
+				can also improve the menu, by making the items actually do something.  
+				also look at TODOs in the code for more options			
+
+
+2015/08/25	a few quick moments in norway...
+			colored the non-selectable options in the event phase a different color (needs to be
+				changed to something else when i can check what the number means)
+			need to change the "phase" system to a "turn type" system...gui shouldn't be hard-coded
+				based on the phase, but instead on whether its an event, slider, event-selector, or
+				whatever phase.  gamestate should tell it which to display.  
+			need to make the stuff all come from rules set, rather than from the gui/gamestate
+			ideally should change "time" to "expendable resource" or whatever, so that we're i
+				working in the most generic setting outside the ruleset.  in some other game
+				it may not be time that they spend each round (and may not spend it each round,
+				either! may be that's the level-up part, and most of the game is actually events!)
+				
+2015/08/27	more norway coding
+			changed the displayPhase methods in the main gui to make it a bit more versatile, and
+				to make use of the rulesSet methods (ie, now isn't hardcoded to be 4 phases in 
+				a row. it asks the rulesSet to tell it what phase to show next, based on the 
+				game state)
+			moved several methods over to the rulesSet from the game state
+			moved miniGui to its own class, rather than a private class in the main gui
+			created a function in the rulesset for determining the activities to use
+				in the spending phase.  need to change the gui phase to have selectable guis
+				that have limited number of options (ie, can only study two magicks at a time)
+				but need to do a bit of googling to figure out how to do drop downs
+
+2015/08/31	norway coding 3: at the hotel, so have internet access, so will try to get
+				the drop box selectors working as desired, and change the color of 
+				the unselectable options 
+			--changed the color of unselectable event options to red
+			--added combo boxes to spend phase.  still haven't linked them to
+				prevent you from doing the same thing twice
+				--combo boxes now work like they should, but need to fix the way they are 
+					initialized so that repeat options aren't there to cause problems...
+					--FIXED!  was rather fiddly, and code is a bit ugly.  probably a ripe for
+						improvement at some later point.  but is functional for now.  
+				
+2015/09/07	back home and working on the game again.  Met with G last week to discuss next steps, and
+			top task for me was to get the slider page functioning/doing stuff with the player stats.
+			Idea is to just try something for now, and iterate as needed.  So have started putting
+			logic into the rulesset function to deal with this... 		
+			--have worked just on getting aeromancy working, as an example case.  written a pair
+				of methods for implementing a logit model for skill advancement, but need to
+				play around with the parameters a bit more to get it balanced as desired.
+			tomorrow: generalize the code a bit better, so I don't have to do every skill/magic
+				by hand.  have it check to see if you've learned the spell once you reach a
+				certain level in skill for magics.
+				
+2015/09/08	today want to expand on what i did yesterday with the time phase, and get all the 
+			current activities handled appropriately.
+			--got the stress system working (goes up as square of 'overtime' hours, but reduces
+				only linearly, so will mostly want to avoid using it, except in a time crunch
+			--all spells handled in same way currently, not sure if this is good or not...
+				do we want different schools to behave differently, or all the same?
+			--skills currently set up to work same as spells.  again, do we want to make them
+				different?
+			--jobs currently set up so that each just gives you gold equal to number of hours spent.
+				will need to update that to include the specifics of each job.
+			--interact:socialize currently not doing anything, as that seems to deal with NPCs, so 
+				will likely be trickier to do.
+			--moved the submit results call to after the second phase; now back button doesn't
+				let them get infinite time
+			Probably need to set up the time-costing actions a bit differently, with each type
+				having it's own class perhaps?  And the one of the elements of the class being
+				a lambda which indicates how to handle time being spent on that action.  Then
+				can put all the magic schools, jobs, etc. into an array, and have the code
+				grab that array and decide what to do with it, rather than it being hard coded
+				into the gui as it is now.  Each of these will also have to have a lambda indicating
+				whether or not it is an available action.  Could also put a "max time" attribute,
+				so that they don't each have to have the same max time that can be spent on
+				them.  
+			also want the time spending page to display estimates of the change in stats that
+				are likely to occur due to the time spent.  can use same function used to compute
+				the change in stats to do this (but will want to use 2 decimal places, most likely?)	
+				
+2015/09/14	only one day to work on this this week (will get 3 next week).  
+				--created a timeSpendOption class, to hold the various schools and skills and such
+					that you can spend time on in the time spend phase.  uses lambdas, so is nice
+					and generic/abstract.  need to put the actual instances in the rulesSet, but
+					original plan was to have ruleSet be purely abstract and not need an implementation.
+					Thinking now that I should make an instance of it, and put the instances of
+					the timeSpendOptions into that instance on instantiation.  Will need to create
+					the instance in main.  
+				--doing a whole lot of breaking of the other classes to get them to use the new
+					TimeSpendOption class.  May take me a while to things working nicely again...
+				--getting things back to how they should be still need to make button to add more
+					mini guis of same type, and link them together.  
+				--have added an arraylist to game state to hold functions which get called after
+					time is spent.  this is so that options not selected in any combobox can
+					be referenced (e.g., if an event wants to check if you ever spend less than X
+					time on a task, but then you don't pick that task in the combo box, you can't
+					put the check in the spendtime function for that activity, because that's only
+					called if they spend time on it.  instead, put the check into the function list,
+					which gets called after all time is spent).  basically, if you need to do something
+					after the time spend phase, make it a function and add it to the array in 
+					gameState.  note, each function has a name, which can be used to remove it
+					from the list, but doing so within the loop may cause problems, so may want to
+					handle that differently? (note, can just overwrite the function with same name
+					but empty function?)
+					
+				for next week:
+					--get the mini gui's working as desired if I haven't finished that today
+						--needs to only expand if less than 5(?) already there, and if there
+							are enough options to fill it up
+						--also need to make sure the submit activties and times gets all the 
+							miniGuis (including ones created with teh > button)
+					--get all the timeOptions filled in in the RulesSets, with functions that
+						actually do something (ie, implement the trainining)
+						--note, make use of the training times functions I've added that now
+							take parameters so different things train a different rates
+						--make sure at least some of the items make use of the predicate function,
+							and put something in it to test it (eg, lore > 10 before you can
+							train necromancy)
+					--read G's docs and make sure I've got everything up to date for the stuff
+						I'm working on
+						
+2015/09/21	had some ideas on how to get the guis working.  need to add some state that keeps track
+			of the previous item selected, then add that to all other guis, and remove the current
+			one when this one makes a selection change.  will work on the list above today, and see
+			how far i get.
+				-- think i've got the mini guis working properly now (split button, at least, 
+					haven't done anything with submitting
+				--	have started implementing affects of time spent.  made a wrapper for studying
+					to avoid a lot of repeated code.  now need to type in all the stuff G has 
+					come up with so far.
+				-- 	added all the spell types, skills,  and jobs in G's list to the things 
+					you can spend time on each month.  all things of each type currently set
+					to do basically the same thing: either give you money equal to time worked,
+					or improve the relevant skill/magic by a given s curve.  necromancy also
+					causes stress at the moment. 
+			Now need to figure out what is the next important thing to work on.  Probably need G 
+			provide some insight into what numbers should go into the various time spend options, 
+			so can put that aside for a while.  
+
+2015/09/24	today the task is to learn github and get my files onto it.
+			--signed up for account.  is £7/month to have private repositories, which i'm willing
+				to pay for at this point, since don't want all my stuff public
+			--installed the app on computer
+			--created a repository on the webpage, and cloned it to the mage guild directory
+				(note, just under the work space, so doesn't actually include all my files)
+			--copy/pasted my files into the repository on my computer
+			--after changes to files, copy them to the repository (note, i'm just copying the src
+				file from teh workspace into the git folder for now.  probably want to copy the 
+				whole thing over and declare a new workspace or something), then open the app.
+				find the repository (mage-guild) on left, will say X uncomitted changes at top.
+				click on that, and it should give you a chance to fill in some messages to describe
+				the changes.  that gets it ready LOCALLY, but still need to send it to server!
+				clikc sync in top right to this...
+			--seems to be working like it should, though i can't claim to fully understand it...								
+
+2015/12/12	first day back after harddrive crash and getting lappy fixed.  trying to get git
+			working as i'd like.  had to create a new ssh key for the harddrive, since
+			lost the old one in the crash (google git creating ssh public key).
+			(note, pw id normal long)
+			-on github page created a new branch in mage-guild called 'after-crash'
+			-navigated into to /src folder of mage guild workspace (is several folders down)
+			  right clicked and did a git bash here
+			-in the git bash window did git init (this creates a .git folder)
+			-git add .   to tell it to track all the files here
+			-git commit -m "first commit"   (saves the tracked files, -m attaches message)
+			-git clone https://github.com/tycho54/mage-guild.git (links local git to my repo)
+			-git remote add origin git@github.com:tycho54/mage-guild.git  (so it knows where 
+					to send stuff
+			-tried git push origin master, but got an error, b/c missing stuff that's
+			 		already in master.
+			-git pull   (to grab any files from github it was expecting ot be there)
+			-git add . , git commit -m  (to bring it all back up to date)
+			-did git push -f origin master (-f is force, which overrides all that other
+				stuff that was causing problems)
+				
+			-moved this file (notes) inside the repository, so it gets saved as well, and 
+				did git add notes, git status, git commit -m "added notes", git push origin master
+			-git branch working (to create a new branch), git push origin working (to
+				make a working branch to keep master safer--use this for now, but can
+				merge into master when im happy with the changes)
+			
+			-next up:  need to put miglayout back into place!	
+				-downloaded the jar file
+				-right clicked mage guild project (top folder on left)
+				-picked buildpath -> add external archive, and pointed it to the file
+				all seems to be working fine now.
+				
+			-now on to getting the magic types put into the rules set...
+				-UFF DA!! running into major problems, eclipse not seeing the updated
+					files, and instead runs old versions from i-dont-know-where.
+				-created a new work space, made new project, copied files over,
+					and now things seem to work.  will need to set everything
+					back up again for git...
+					
+			
+				
+				
+ISSUES:		-Need to settle on a screen size/resolution and/or sort out how to make it resize
+				as we want it to.
+			-NPCs and all the world other than the PC
+			-time-free actions (check out book, trade, etc)
+			-extra info pages and menu bar options
+			-servants (golems, imps, etc.)
+			-item creation and use
+			-Event creator GUI for G to use
+			-spell combat?
+			-system for determining which "random" events occur each month
+			-
+							
