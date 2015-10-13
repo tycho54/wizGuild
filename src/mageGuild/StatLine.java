@@ -39,9 +39,9 @@ public class StatLine extends HashMap<String, Float>{
 	
 	
 	//constructors:
-	public StatLine(){
-		
+	public StatLine(){	
 	}
+	
 	public StatLine(String[] names, Float[] values){
 		if(names.length == values.length){
 			for(int i=0; i < values.length; i++){

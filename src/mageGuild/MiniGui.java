@@ -122,10 +122,10 @@ public class MiniGui extends JPanel implements ActionListener {
 						miniGui.removeOption(nextOptions.get(0));
 					}
 				});
-					
-					
-					
-					
+				
+				linkedGuiPanel.setPreferredSize(linkedGuiPanel.getPreferredSize());
+				//linkedGuiPanel.revalidate();
+				//linkedGuiPanel.repaint();
 			});
 			this.add(splitButton, "cell 3 0, spany 2, growy");
 		}

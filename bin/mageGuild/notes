@@ -381,6 +381,53 @@ Notes for mages guild
 				-created a new work space, made new project, copied files over,
 					and now things seem to work.  will need to set everything
 					back up again for git...
+					--right clicked on mage guild (project level) in directory,
+						and clicked git bash here
+					--git init
+					--git add .
+					--git commit -m "after copied to new workspace"
+					--went to github, created new private repository, called wizGuild
+					--git remote add origin git@github.com:tycho54/wizGuild.git
+					--git push origin master
+					--git branch working
+					--git push origin working
+					seems like all is okay now.
+				
+			--Okay, on to magic types for real now!
+				--re-rewrote the skills update code to only use a scale, not
+					a scale and an offset--since we want skills to start at
+					1 effectively (0 would be better, but causes blow ups), 
+					offset was determined by the scale.  now only a one parameter
+					model, which is nicer.  also hard-coded max value to 100.
+				--put in a stress increase for aeromancy based on G's numbers, 
+					but will cause way too much as is, so will need to reduce
+					significantly
+				--put in a chance to learn a magic based on skill level, but may
+					be way too hard to learn in current state.  will need to
+					check with graeme about what his numbers mean
+			
+2015/10/13		starting this morning on getting the stress and learn-times
+					put into the game.  talked w/ g last night re: stress scores,
+					and he basically said to just use the numbers as guides, and
+					use my judgement, so can make it up, basically.  also, wants
+					learn times to be as stated, +/- about 10.  difficulty can
+					be ignored for now.  
+				--all magics are now in the system for learning time and stress, 
+					following G's notes as guidelines
+				--made stress reduce your chance of learning a new magic by the 
+					current value (e.g., if you had 50% chance of learning it, 
+					and 10 stress, you'd drop to 40% chance)
+				--also made stress reduce effective time spent studying by 1/10 
+					of the current stress levels (which means stress has bigger
+					impact if you're trying to do lots of different things, which
+					seems appropriate) (note, only has effect if stress >10,
+					because using floor).
+				--put a vertical scroll bar on the skill list of the player
+					info panel.  will need to separate the items into reasonable
+					groups at some point (skills, magics, attributes, etc).
+				--fixed a bug where the main panel wasn't resizing properly when
+					adding a new mini gui
+					
 					
 			
 				

@@ -196,7 +196,6 @@ public class MainGuiPanel extends JPanel {
 	    });
 		this.add(doneButton, "cell 3 1");
 		
-		
 		this.revalidate();
 		
 		
