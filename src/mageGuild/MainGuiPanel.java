@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -38,7 +39,8 @@ public class MainGuiPanel extends JPanel {
 	private JLabel currentRestTime;
 	private ArrayList<MiniGui> miniGuis;
 	private HashMap<String, Integer[]> nextGroupLocation;
-	private LinkedHashMap<TimeSpendOption, Integer> activitiesAndTimes;
+	private LinkedHashMap<TimeSpendOption, Integer> activitiesAndTimes
+	        = new LinkedHashMap<TimeSpendOption, Integer>();
 	int tempCol;
 	int tempRow;
 	
@@ -106,10 +108,38 @@ public class MainGuiPanel extends JPanel {
 			nextGroupLocation.put(name, new Integer[]{0,tempRow});
 			addMiniGui(temp, name);
 			
+			//want previous month's choices to remain, so need to
+			//loop over last months time spending and use it to 
+			//fill in miniguis:
+			//NOTE--this is ugly way of doing things.  .containsKey didn't
+			//seem to be working, so this is a kludge.  much room for 
+			//cleaning this up.
+			options.forEach((TimeSpendOption currentOption) -> {
+				activitiesAndTimes.forEach((TimeSpendOption key, Integer value)->{
+					if(key.toString().equals(currentOption.toString()) & value > 0){
+						if(temp.getTimeToSpend() > 0){
+							temp.getLastMiniGui().expandIfPossible();
+						}
+						//do stuff to last one
+						temp.getLastMiniGui().setSelected(currentOption);
+						temp.getLastMiniGui().setTime(value);
+						//System.out.println("do stuff w/" + currentOption);
+					}
+				});
+			});
+			
+			
+			
+			
 			//this.add(temp,  "cell "+tempCol + " " +tempRow);
 			tempRow++;
 		});
 		
+		//now need to set the mini gui's to the values of last month's 
+		//time spend, if any:
+		activitiesAndTimes.forEach((TimeSpendOption, Integer)->{
+			//System.out.println(TimeSpendOption);
+		});
 		
 		
 		
@@ -117,7 +147,7 @@ public class MainGuiPanel extends JPanel {
 		//add a done button; when clicked it needs to send the info to the gameState
 		JButton doneButton = new JButton("Done");
 		doneButton.addActionListener((ActionEvent e) -> {
-			//create a hashmap of the options and the time spent on each
+			//reset the hashmap of the options and the time spent on each
 			activitiesAndTimes = new LinkedHashMap<TimeSpendOption, Integer>();
 			for(MiniGui tempGui: miniGuis){
 				activitiesAndTimes.put(tempGui.getSelected(), tempGui.getTimeToSpend());

@@ -34,6 +34,7 @@ public class Character {
 		characterImage = new File("images/can-stock-photo_csp14845282.jpg");
 		gender = newGender;
 		flags = new HashMap<String, String>();
+		this.addFlag("defaultFlag", "defaultCharacterFlag");
 	}
 	
 	
@@ -50,7 +51,13 @@ public class Character {
 		return(this.stats);
 	}
 	public Float getStat(String statSought){
-		return(this.stats.getStat(statSought));
+		//return(this.stats.getStat(statSought));
+		if(stats.containsKey(statSought)){
+			return(stats.get(statSought));
+		} else {
+			return(new Float(-999));
+			//throw new UnsupportedOperationException("stat "+ statSought + " not found");
+		}
 	}
 	public void setStat(String statSought, Float newValue){
 		this.stats.setStat(statSought, newValue);
@@ -79,7 +86,14 @@ public class Character {
 	public void changeFlag(String flagName, String newInfo){
 		flags.put(flagName, newInfo);
 	}
-	
+	public String getFlag(String flagName){
+		if(flags.containsKey(flagName)){
+			return(flags.get(flagName));
+		} else {
+			return(flags.get("defaultFlag"));
+			//throw new UnsupportedOperationException("flag "+ flagName + " not found");
+		}
+	}
 	
 	
 	public enum Gender {

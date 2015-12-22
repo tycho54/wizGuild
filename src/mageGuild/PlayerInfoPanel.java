@@ -1,7 +1,7 @@
 package mageGuild;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 //import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
@@ -82,8 +82,12 @@ public class PlayerInfoPanel extends JPanel {
 		RulesSet.getListOfMagics().forEach((stat) -> {
 			Float value = thePlayer.getStat(stat);
 			if(value > 0){
-				skillPanel.add(new JLabel("   " + stat ));
+				JLabel tempLabel = new JLabel("   " + stat );
+				skillPanel.add(tempLabel);
 				skillPanel.add(new JLabel( "     " + new DecimalFormat("#").format(value)), "wrap");
+				if(thePlayer.getFlags().get("casts"+stat)=="true"){
+					tempLabel.setForeground(Color.BLUE);
+				}
 			}
 		});
 		

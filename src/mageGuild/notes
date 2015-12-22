@@ -427,10 +427,230 @@ Notes for mages guild
 					groups at some point (skills, magics, attributes, etc).
 				--fixed a bug where the main panel wasn't resizing properly when
 					adding a new mini gui
+				--thought that was some good progress, so made a git commit and
+					pushed it to github on teh working branch
 					
+2015/10/27		--added +1 time unit within the study magic code, so that you
+					effectively get 1 more time unit studying anything when 
+					you do it.  This is to make diversifying more feasible.
+				--previously would repeatedly add same flag to character if
+				    you learned magic school again.  now checks to see if you
+				    already have it before adding it.
+				--after much fighting, got it to keep last months time spend
+					selections, so that you don't have to do the same stuff
+					over and over.
 					
+2015/11/10		--need to make some progress on the event builder today.  still
+					not clear how to do "data as code" in java, but need to get
+					a start on the gui at very least.  likely i'll have to either
+					create extra constructors for my event and consequences classes,
+					or create factory methods?  whatever the case, need to make 
+					some progress now.  will worry about next steps once i've got
+					a way to collect some basic info from the user.  
+				--have created a frame, and put some panels in it, gave it a menu
+					bar.  doesn't do anything at this point, but it exists.  
+					have created classes for each of the three areas that will
+					need to be created for an event: predicate, text, and options.
+					Each of these will be fairly involved in and of themselves,
+					but all have the same issue--translating player text and 
+					clicks into code inside an object.  if I can figure out how
+					to do one, should be able to do all of them in similar 
+					fashion.  hardest one will be options, since they have several
+					components.  text and predicate will be easier, so probably
+					want to start with one of them.
+					
+						-can use .put in a map to match text with values...
+							e.g., if they type "x=4", i could use myMap.put(x,4)
+							but get the "x" and the "4" from the string...
+						-can use an array list of characters, and refer to them
+							by index within the text.  need the final version to
+							refer to elements of the gamestate.  question is how
+							to get them out?  will need to label them within the
+							gamestate in a way that lets me get them out (setting
+							flags?).  
+						-may also want to rethink class definition of events...
+							should they be interfaces of functions that get called
+							when the game runs them, rather than just having 
+							elements in them?  this might make it easier to create 
+							them...create as data with a "implement" function,
+							which is called at run time to produce the necessary
+							fields?  or just use a "getter" that returns text, 
+							for example, but use it to generate the text, rather
+							than just returning a stored value...
+							
+2015/11/11	continue work on event builder today.  another idea is just creating
+			a pure text file file that is compilable?  
+			-added text field for entering event text
+
+2015/11/13	have redone the gui for the event builder.  instead of using a new
+			class for each panel, and much just using plane old JPanels and 
+			some helper functions to initialize them.  keeps all the related 
+			code in a single place, which should hopefully make things easier.
+			--need:  validate button on each section, and a label that shows
+				validation status (passed, failed, unchecked) for each.  in
+				the options section, each option needs this, and needs a button
+				to highlight it in the options panel. (note--don't worry about
+				doing the validation just yet--just have a dummy function
+				that always returns true for now)  
+			-if i can get all the info as strings, i could at very least
+			write everything to a file, and figure out how to read it in later.
+			in a worst case scenario, i coulg give that to G while still trying
+			to figure out how to parse the text.
+
+2015/11/24	did some work on train to consequences, so gui is doing much more.
+			added a method for storing option state when selecting an option.
+										
+										
+2015/11/30										
+										
+	--will need to change the event class--text will need to be a producer<string>
+		not a string itself, since it may need to change based on the gamestate
+		(e.g., refer to an NPC's name in the text).  Likewise for options text.
+		-Related to this, when do should events be instantiated?  When should the 
+		objects created by teh event builder be read into memory?  Does the builder
+		create event objects that get written to file, or just text files that get
+		used when creating the event objects?  is it feasible to keep all the events
+		in memory, or do we need to keep them on disk until they're needed?
+		--should the private variable for the text be just a string, but the 
+			interpretter be part of the function that returns it?  So that mapping
+			what G types into the actually shows up on screen is done within the
+			event class method, rather than the event builder gui?  Ditto for
+			all the other stuff in the Event class?  Still need to validate the
+			stuff in the builder, so may make more sense to put it there...also
+			probably more efficient to do any necessary mapping there?  
+	--for event and option text parsing: break all input down into an arrayList of
+		strings, some of which will be marked as code somehow (e.g., w/ ** on each 
+		end?).  then need to have the parse be able to read the code parts.  they
+		will all be generating Strings, and have a limited set of options to consider.
+		Basically need flags (on gamestate and characters), and any methods attached
+		to these (getName() etc).  One issue to consider is that flags may not be
+		set, so need it to not crash when that is the case.  Might be a good idea
+		to start with the text field as the first one w/ G?
+		--note: each bit of code in the text can evaluate to a single string, so
+			should be comparatively easy to parse (ie, doesn't need to be recursive
+			or anything, just a look-up/get call).  
+			things we might need:
+			-character names
+			-character gender terms (his/her/its, him/her/it, etc)
+			-character flag values
+			-gamestate flag values
+			-for small list like this, probably best to just have a one-word 
+				identifier to indicate which of these, followed by the text
+				string of its name?  
+					-might not work if i want to use the name of a character given
+						in a flag?  or gender term of character given in a flag...
+						so will need to be able to deal with compound code stuff.
+				-so perhaps instead just have functions for each of these?  Or a
+					single function which takes a value for all possible inputs, 
+					and throws out the appropriate result from the combo?								
+				-if we have a language where each command is a function that
+					takes in a single parameter, and reads entirely left-to-right,
+					then we just can write a recursive function that evaluates
+					everything to the right of the first word, then uses that as 
+					the parameter to for the function that corresponds to the first
+					word.  Must be some things that take nothing as a parameter 
+					(ie, the last thing on the line).  Would this gives us enough
+					flexibility for the text?  Seems like so from the list above,
+					but perhaps not if we add more things it needs to be able to do.
+					-hisHerIts (and similar functions)
+					-npcNamed (string input, character output)
+					-pc (no input, returns PC)
+					-valueOfCharFlag
+					-valueOfStateFlag			
+						-if flags contain multiple values, separated by ; then 
+						we'd need functions like takeFirstValue and takeSecondValue
+						etc, which seems ugly, but avoids the multiple inputs aspect.
+						-alternatively, as long as we know the number of elements
+						each function requires, we could have it evaluate just the
+						next element, then all the rest?  	
+				BUT--need to make a single lambda out of the input, not get a single
+					string!  So using a bunch of functions like this won't work...
+					can we build up a lambda of lambdas?  yes, can still do this.
+					(l1, l2) -> {return (l3) -> (l1(l2.execute()))}
+					--not sure if that syntax will work, but there is a way to do
+						this with lambdas, definitely.  		
+				--will want to make some test cases for this, as it's going to be
+					very challenging to code up, so likely to have lots of bugs.	
+	--check out scanner class--seems to do what i need for simple types...maybe can
+		extend it?
+	--check out prefuse string parser?
+	--nashhorn javascript engine?
+	https://github.com/greenjoe/lambdaFromString
 			
 				
+2015/12/08	working on parser for event text today.  hopefully can do a recursive
+			method that returns a lambda, with a switch statement on each of
+			the eligible words.  	
+			--wrote a first version of the parser, but haven't tested/debugged it yet.			
+			--done some testing/debugging, and seems to be working
+				
+2015/12/14	need to expand the parser to take in all the text (not just the code
+			subsections), and return a lambda which creates the full event text.  
+			--got this working, and did some testing.  handles extra spaces gracefully
+				now, both within, and at start/end.  
+				
+			-next thing is probably making the validate button work in the event
+				builder.  how can i check that the string input is a valid expression,
+				without first having a game state created?  Will probably need to
+				make an exception class, and throw an exception from the parser. if it
+				gets to a word it doesn't expect.  
+				--note, the string can be valid for the parser and still lead to an
+					error if the gamestate doesn't have the appropriate flags set.
+					so will still need to be aware of that possibility
+				--will largely be the job of the event predicate to avoid problems
+					with flags not being set--is there anyway to check that the
+					predicate guarantees the other stuff is safe as part of the
+					validation process?  (ie, it checks that if the predicate is
+					true, then all the stuff in referred to in the text will
+					also be able to be called?)
+				--also, when i do the predicates, i'll need to be able to check
+					for flag values which might not exist (ie, won't be set), and
+					when that happens it should return false, not throw an error.
+					BUT when validating the predicate i want it to throw an error if
+					the expression doesn't parse properly.  
+					for predicate parsing will need at least these:
+						-flagCalled__isSet (for both characters and state)
+						-flagCalled__isEqualTo (ditto)
+						-valueOf__isGreaterThan (equal to, less than, etc)
+						-getFlagCalled (for characters and state)
+						-getValueOf__ (for manythings, but hopefully can use one method)
+			--getting the event builder to validate text, and be able to save it is
+				probably the step that will start letting G actually make use of
+				some of this stuff.  Will eventually probably want buttons for each
+				of the words so he doesn't have to remember them, but probably best
+				to add the needed functionality before the nice-to-have stuff, so that
+				we can start putting it to use/testing it out in a realistic way.  
+			--written some code to try to validate the eventText.  running into problem
+				in that it doesn't seem to instantiate the function until I call it,
+				so will only check for exceptions once I try to make the actual string
+				(which means it wants all the gamestate stuff satisfied).  
+				--perhaps should make sure a gameState always returns something when
+					queried..., even if it's a made-up object just for this purpose?
+					--tried throwing exceptions from gameState and Character when
+					undefined flags/stats are requested.  But I used the same
+					exception type I was using before, so leads to same invalid state
+					as if there is a syntax error in the code, which isn't whati want.
+					i could throw a different type of exception, but it'll end up
+					in a different catch block, which may lead to real errors being
+					missed.  probably actually need to return dummy objects (eg, -999
+					for bad stats, and "Flag not set" for flags, and a dummy character
+					for bad characters?  This will let the eventbuilder do validation
+					better, but may make the game less stable in the long run, as
+					runtime exceptions won't show up as early, and bugs will be harder
+					to track down...
+				--created a defaultFlag in gameState and Character, and a defaultNPC
+					in gamestate.  also made getStat return -999 when a stat is not
+					listed, rather than throwing an error.  now the validator looks
+					to be doing what I want, though it will still miss typos on 
+					stat and character names and flagnames.				
+				
+2015/12/21		added some save functionality to the event builder.  will work on
+					loading etc. next.  
+					
+2015/12/22		added load option too.  need to do some file-safety stuff as well,
+					ideally creating a specific extention that it opens, and won't
+					save any other format.  or at very least it will prompt to make
+					sure you want to overwrite something if you try to.			
 				
 ISSUES:		-Need to settle on a screen size/resolution and/or sort out how to make it resize
 				as we want it to.

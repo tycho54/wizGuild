@@ -28,7 +28,7 @@ public class MiniGui extends JPanel implements ActionListener {
 	TimeSpendOption previousOption;
 	TimeSpendOption currentOption;
 	Integer membersInGroup; //this is the number of other miniGuis in the panel that share the items
-	
+	MiniGui nextMiniGui; 
 	
 	// most stuff gets created in the constructor:
 	public MiniGui(String activityName, 
@@ -44,7 +44,7 @@ public class MiniGui extends JPanel implements ActionListener {
 		this.currentOption = options.get(0);
 		this.previousOption = null;
 		membersInGroup = groupSize;
-		
+		this.nextMiniGui = null;
 		
 		
 		//drop down box for selecting the sub topic
@@ -109,16 +109,16 @@ public class MiniGui extends JPanel implements ActionListener {
 					}		
 				}
 				
-				MiniGui temp = new MiniGui(activityName, nextOptions, linkedGuiPanel, this.membersInGroup + 1);;
+				nextMiniGui = new MiniGui(activityName, nextOptions, linkedGuiPanel, this.membersInGroup + 1);;
 				//send it to the linked panel
-				linkedGuiPanel.addMiniGui(temp, activityName);
+				linkedGuiPanel.addMiniGui(nextMiniGui, activityName);
 				//remove the splitButton, as only the newest miniGui in the group should have it:
 				this.remove(splitButton);
 				
 				//now need to remove the selected item of the newly created gui from all others
 				//in the same group:
 				linkedGuiPanel.getMiniGuis().forEach((miniGui)-> {
-					if(miniGui.getGroupName().equals(this.getGroupName()) & miniGui != temp){
+					if(miniGui.getGroupName().equals(this.getGroupName()) & miniGui != nextMiniGui){
 						miniGui.removeOption(nextOptions.get(0));
 					}
 				});
@@ -143,6 +143,45 @@ public class MiniGui extends JPanel implements ActionListener {
 	}
 	public TimeSpendOption getSelected(){
 		return (TimeSpendOption)optionsBox.getSelectedItem();
+	}
+	public MiniGui getNextMiniGui(){
+		//note, if there is no next miniGui, this one returns
+		//the miniGui itself
+		if(nextMiniGui == null){
+			return this;
+		} else {
+			return nextMiniGui;
+		}
+	}
+	public MiniGui getLastMiniGui(){
+		//this returns the LAST minigui in a chain, which may be
+		//this mini gui.
+		if(nextMiniGui == null){
+			return this;
+		} else {
+			return nextMiniGui.getLastMiniGui();
+		}
+	}
+	
+	//setters
+	public void setSelected(TimeSpendOption option){
+		//use this to set an option
+		this.optionsBox.setSelectedItem(option);
+	}
+	public void setTime(int time){
+		//use this to set the time value
+		for(int i=0; i < time; i++){
+			this.moreTime.doClick();
+		}
+	}
+	
+	
+	public void expandIfPossible(){
+		//uses the split button if a split button exists
+		if(splitButton == null){
+		} else {
+			splitButton.doClick();
+		}
 	}
 	
 

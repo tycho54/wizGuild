@@ -247,8 +247,10 @@ public abstract class RulesSet {
 		 * applies the timeToSkill function and updates the player's stats.
 		 */
 		//this is what happens when they study
-		time = new Integer((int)Math.floor(time 
+		time = new Integer((int)Math.floor(1 + time 
 					- state.getPlayerCharacter().getStat("Stress")/10));
+		//note: added +1 time unit above--means studying is more efficient
+		//in small amount (though that will take longer overaall)
 		if(time > 0){
 			Float currentSkill = ((GameState)state).getPlayerCharacter().getStat(skill);
 			Float change = timeToSkill(currentSkill, time, scale);
@@ -285,8 +287,10 @@ public abstract class RulesSet {
 		Random randomGenerator = new Random();
 		Float randomFloat = 100*randomGenerator.nextFloat();
 		if(randomFloat <= currentValue - numToBeat - character.getStat("Stress")){
-			character.addFlag(flagName, flagInfo);
-			System.out.println("Success! Learned " + flagName);
+			if(character.getFlags().get(flagName) != flagInfo){
+				character.addFlag(flagName, flagInfo);
+				System.out.println("Success! Learned " + flagName);
+			}
 		} 
 	}
 	
