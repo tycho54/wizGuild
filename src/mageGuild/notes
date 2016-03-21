@@ -650,8 +650,164 @@ Notes for mages guild
 2015/12/22		added load option too.  need to do some file-safety stuff as well,
 					ideally creating a specific extention that it opens, and won't
 					save any other format.  or at very least it will prompt to make
-					sure you want to overwrite something if you try to.			
+					sure you want to overwrite something if you try to.	
+				pushed latest changes onto github.
+		
+2015/12/23		made the file chooser only look for files with certain extensions,
+				and then made a jar file and sent it to G for feedback. 		
 				
+2016/01/05		working on bugs in event builder that Graeme found.  
+				--fixed issue that it wasn't line wrapping in the text areas
+				--adjusted sizes a bit to make things fit better (still not perfect)
+
+				--need to deal w/ fact it reads in thigns by line.  probably need
+					to put field demarcations in somehow, instead of assuming each
+					line is one bit of the input
+				--also need to sort out how best to put line breaks into the 
+					event text--hitting return may not be ideal?
+				--need "new" option to reset everything
+				--NPCnamed doesn't seem to be working as intended...can't take in
+					output of a flag call (either from state or from character)
+				--needs to give feedback on why its not validating when that happens
+					is too hard to track down typos etc.
+				--put array thing back in (example of list of players in game
+					of poker)
+				--need to initialize flags before event starts, so will need a
+					new field for making a "consequence" before player has chosen
+					any options.  note--may not be needed for every event, so
+					needs to free to be blank/empty
+					--also good to be able to see which flags have been set here, 
+						for easier reference (when making the text)
+					--might also be good to place assertions here for flags elsewhere
+						so they can be checked more closely in the validation step
+						(e.g, flagnames get checked as well as rest of stuff)
+				--comparator words (eg "you are ££worseBetter ...££ than £...£ at...")
+					so text can give hint as to who's better at something?
+					(ideally with multiple levels (slightly better, much better,
+					far far better, etc)
+				--description of how good someone is at something "formidable" 
+					"beginner" (~10 levels?)
+					--may need different words for skills, magic, stats
+					--three different code words, then, rather than single word
+						that does all three
+				--add buttons for each word
+				--dialog box for delete buttons for options 
+
+2016/01/12	working on list of things from meeting w/ G today. (see above)
+			-made a "new" option on the file menu to blank out everything
+			-added a confirm pop up for the new option, so you don't accidently
+				overwrite your work
+			-added a confirm pop up for deleting options, and fixed a bug that 
+				occurred when you delete the selected option
+
+2016/02/02	continuing work on list from meeting w/ G.  meeting up later today
+				as well.  should i do a bit of work on other systems after event
+				text is sorted, or continue on event system?
+			-created a message box that shows the error message from the parser,
+				so there will be more feedback for the user to act on.
+			-fixed problem with NPCnamed
+			-changed the way it saves, so now fields are set off between
+				<eventPreciate></eventPredicate> and similar tags.  haven't
+				coded in the options parts yet. still need to make it read
+				in the predicate and text using this format too.
+			-changed the way it loads to match the new save format.  still doesn't
+				deal w/ options, but predicate and text are working as desired
+				
+				
+			-still need scrollbuttons for text fields on event builder
+			
+2016/02/08	continuing to work on event builder	
+			-java updated, and now eclipse won't run my code...(can't find
+				executable for new version of java?).  will need to fix...
+				-have ticked a box in project->properties->build to use the new 
+					version, but that doens't seem to have fixed things	
+				-tried help->update and had it update eclipse...this seems to have
+					worked...running as expected now.
+			-scroll bars added to predicate and text fields for events
+			-scroll bars added to the three options panels as well	
+
+2016/02/09	buncha job stuff today...
+			todo:  put tags around whole option section, and after the first tag
+					put a single value on the next line which tells how many
+					options there are.  do a for loop over that number, within
+					each write/read the option components (just like i did for
+					the event part).  
+				   Need section for event-specific tags
+				   Need buttons for the coding options
+				   
+2016/02/23	back after a bit of a break (jobs hunt and holiday).  need to make some
+			progress on the event builder. realized i should probably reorganize 
+			the text parser code a bit.  should keep the class itself generic, and
+			make it specific on instantiation.  that way can use same class with
+			each box in the event editor, and just give each of them a different
+			set of lambdas.  Each code word has a name, a lambda, and an error 
+			message.  can make a hash table of them at instantiation? 
+				-use a factory pattern here.  each type of parser has a method
+				for creating it within the textParser class.
+			-another idea--when i make buttons for each code word, give them
+			tool tips on hovering that show the format expected.
+
+2016/02/29	re-wrote the textparser code to use above ideas...
+2016/03/01	put this into the event builder, and it's running, validation isn't
+			working properly...
+				--need to force it to check that expected types match up, and 
+					throw an exception if not.  
+				--also need to test that a valid function does what I expect (seems
+					possible that the removing of elements of the array could 
+					trip things up when it finally gets called.
+					
+2016/03/07	putting in checks for expected types in codeword instances.  
+			--validation step seems to be working as expected now
+			still need more words, and to test that the functions returned actually
+				give the results expected
+2016/03/08	struggling to get functions to return what they should...
+			--after much pain, got it running properly.  
+			todo:  buttons for each of the words, added in a loop, with hover
+				notes working (note, may not be buttons, if there are too many,
+				may have to be scrollable list instead?).  
+				-fix saving/loading so that all option info is included (check if that's
+					already done)
+				-need another section in the GUI for pre-setting event flags, etc.
+				-put other words into list (for skill levels, etc. might want
+					to put them into the character class, and just call them
+					from the relevant codewords)
+
+2016/03/15	would like to get this version of the event builder wrapped up a bit, so
+			i can send it off to G for him to start using.
+			Stuff still needed:
+			-new section for event intializing
+			-drop down for words in text section (G mentioned the idea of the
+				list popping up when he right clicks in teh text field...see if
+				that's an option)
+			-make sure all sections save/load appropriately, including each
+				individual event
+			-put the remaining words into the collection (one for an array, others
+				for the levels of magic and skills (description words)
+			-scroll bar on all the sections (inc. add event box), since not sure
+				how well everything will fit on G's screen
+			-would be good to github everything once it's working, too.
+			
+		-got it now saving options data as desired
+		-after much fighting, it now loads everything as desired too
+		-added scrollbar to options section
+		-added new text section for init section
+		-updated load,save, new to include the new section
+		
+		TODO for next time:  get the drop-down list of words put into the
+							event text panel, and add some more words
+			
+2016/03/21	need to get the codewords into a dropdown list, and ideally a popupmenu
+			on a right click done so i can send it over to G today.  if time,
+			add some more words as well.
+			-put in combobox menu for code word, did some reformatting, and it 
+				seems to be working as desired
+			-put in another check in validation, to make sure each section of 
+				code ulitmately returns a string
+			-fixed bug in validator when text started with code
+			
+			
+			
+
 ISSUES:		-Need to settle on a screen size/resolution and/or sort out how to make it resize
 				as we want it to.
 			-NPCs and all the world other than the PC
